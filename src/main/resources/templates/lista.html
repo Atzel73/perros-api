@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <style>
+        .parallax {
+            /* Ajusta la altura según tu diseño */
+            height: 100vh;
+            background-image: url('https://i.pinimg.com/564x/89/af/c7/89afc7349d4b028192c696004a971019.jpg');
+            background-attachment: fixed;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            position: relative;
+            overflow-x: hidden;
+            overflow-y: auto;
+            perspective: 1px;
+            transform-style: preserve-3d;
+        }
+
+        .parallax:before {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            background: inherit;
+            z-index: -1;
+            transform: translateZ(-2px) scale(3);
+            background-size: cover;
+            background-position: center;
+        }
+
+        /* Estilos adicionales para el contenido */
+        .content {
+            padding: 50px;
+            color: white;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .enter {
+            color: blueviolet;
+            background-color: aliceblue;
+            filter: grayscale(100%);
+            align-self: center;
+        }
+
+        .enter:hover {
+            transform: scale(1.1);
+            transition: 1s;
+            filter: brightness(100%);
+        }
+
+        h1 {
+            color: blueviolet;
+            font-size: 5em;
+        }
+
+        .contenedor {
+            display: flex;
+            justify-content: space-evenly;
+            align-items: center;
+            padding: 50px 0;
+            z-index: 1;
+        }
+
+        .card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 1%;
+        }
+    </style>
+</head>
+<body>
+<div class="parallax">
+    <div class="content">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <div class="container-fluid">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="#">Lista</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/prueba">Prueba</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/countries">Paises</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        <div class="input-group input-group-lg">
+            <button onclick="GetData()" class="input-group-text" id="inputGroup-sizing-lg">Buscar</button>
+            <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-lg" id="user">
+        </div>
+        <div class="contenedor">
+            <div th:each="persona: ${personas}" class="card">
+                <h1 th:text="${persona.nombre}"></h1>
+                <h2 th:text="${persona.apellidos}"></h2>
+                <h3 th:text="${persona.edad}"></h3>
+            </div>
+        </div>
+        <div id="data"></div>
+    </div>
+</div>
+
+<script>
+    function GetData() {
+        const info = document.getElementById("data");
+        const buscar = document.getElementById("user").value;
+        fetch(`https://api.github.com/users/${buscar}`)
+            .then(response => response.json())
+            .then(json => {
+                console.log("datos: ", json.bio)
+                if (json) {
+                    info.innerHTML = `
+                        <div class="card" style="width: 18rem;">
+                            <img src=${json.avatar_url} class="card-img-top" alt="...">
+                            <div class="card-body">
+                                <h5 class="card-title">${json.login}</h5>
+                                <p class="card-text">${json.bio}</p>
+                                <a href=${json.html_url} class="btn btn-primary">Perfil</a>
+                            </div>
+                        </div>
+                    `
+                } else {
+                    info.innerHTML = "<h1>Usuario no encontrado</h1>";
+                }
+            })
+            .catch(err => console.log('Solicitud fallida', err));
+    }
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+</body>
+</html>
